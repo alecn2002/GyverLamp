@@ -38,7 +38,7 @@ uint32_t getPixColorXY(uint8_t x, uint8_t y)
 #if (CONNECTION_ANGLE == 0 && STRIP_DIRECTION == 0)
 #define _WIDTH WIDTH
 #define THIS_X x
-#define THIS_Y y
+#define THIS_Y y// !defined(MATRIX_LEVELS) || (defined(MATRIX_LEVELS) && MATRIX_LEVELS < 2)
 
 #elif (CONNECTION_ANGLE == 0 && STRIP_DIRECTION == 1)
 #define _WIDTH HEIGHT
@@ -84,6 +84,8 @@ uint32_t getPixColorXY(uint8_t x, uint8_t y)
 #endif
 
 // получить номер пикселя в ленте по координатам
+
+#if !defined(MATRIX_LEVELS) || (defined(MATRIX_LEVELS) && MATRIX_LEVELS < 2)
 uint16_t getPixelNumber(uint8_t x, uint8_t y)
 {
   if ((THIS_Y % 2 == 0) || MATRIX_TYPE)                     // если чётная строка
@@ -95,3 +97,23 @@ uint16_t getPixelNumber(uint8_t x, uint8_t y)
     return (THIS_Y * _WIDTH + _WIDTH - THIS_X - 1);
   }
 }
+
+#else // !defined(MATRIX_LEVELS) || (defined(MATRIX_LEVELS) && MATRIX_LEVELS < 2)
+
+static const uint16_t pixelNumbers[HEIGHT][WIDTH] = {
+  {48, 52, 56, 60, 0, 4, 8, 12},
+  {49, 53, 57, 61, 1, 5, 9, 13},
+  {50, 54, 58, 62, 2, 6, 10, 14},
+  {51, 55, 59, 63, 3, 7, 11, 15},
+  {32, 36, 40, 44, 16, 20, 24, 28},
+  {33, 37, 41, 45, 17, 21, 25, 29},
+  {34, 38, 42, 46, 18, 22, 26, 30},
+  {35, 39, 43, 47, 19, 23, 27, 31}
+};
+
+uint16_t getPixelNumber(uint8_t x, uint8_t y)
+{
+  return pixelNumbers[y][x];
+}
+
+#endif// !defined(MATRIX_LEVELS) || (defined(MATRIX_LEVELS) && MATRIX_LEVELS < 2)
